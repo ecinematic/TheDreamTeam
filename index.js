@@ -36,10 +36,11 @@ while (!isTeamComplete) {
         },
     ];
 
-    const {employeeType} = await inquirer.prompt(employeeType);
+    const {employeeType} = await inquirer.prompt(employeeQuestion);
 
     if (employeeType === "none") {
         isTeamComplete = true;
+        console.log(employees)
     } else {
         if (employeeType === "engineer") {
             await createEngineer();
@@ -51,7 +52,7 @@ while (!isTeamComplete) {
 };
 
 const HTML = generateHTML(employees);
-fs.writeFileSync("team.html", HTML, (err) => {
+fs.writeFileSync("./dist/team.html", HTML, (err) => {
     if(err) {
         console.log(err);
     } else {
@@ -69,8 +70,34 @@ const createManager = async() => {
     ];
 
     const managerAnswers = await inquirer.prompt(managerQuestions);
-    const manager = new Manager(managerAnswers);
+    const manager = new Manager(managerAnswers.name, managerAnswers.id, managerAnswers.email, managerAnswers.officeNumber);
     employees.push(manager);
+};
+
+const createEngineer = async() => {
+    const engineerQuestions = [
+        {type: "input", message: "Enter Engineer Name", name: "name", validate: validInput,},
+        {type: "input", message: "Enter ID", name: "id", validate: validInput,},
+        {type: "input", message: "Enter GitHub", name: "github", validate: validInput,},
+        {type: "input", message: "Enter Email", name: "email", validate: validInput,}     
+    ];
+
+    const engineerAnswers = await inquirer.prompt(engineerQuestions);
+    const engineer = new Engineer(engineerAnswers.name, engineerAnswers.id, engineerAnswers.email, engineerAnswers.github);
+    employees.push(engineer);
+};
+
+const createIntern = async() => {
+    const internQuestions = [
+        {type: "input", message: "Enter Intern Name", name: "name", validate: validInput,},
+        {type: "input", message: "Enter ID", name: "id", validate: validInput,},
+        {type: "input", message: "Enter School", name: "school", validate: validInput,},
+        {type: "input", message: "Enter Email", name: "email", validate: validInput,}     
+    ];
+
+    const {name, id, email, school} = await inquirer.prompt(internQuestions);
+    const intern = new Intern(name, id, email, school);
+    employees.push(intern);
 };
 
 

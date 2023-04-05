@@ -1,72 +1,54 @@
-const { placeholder } = require("@babel/types");
-const fs = require("fs");
-const path = require("path");
-
-const templateDirectory = path.resolve(__dirname, "../templates");
-
 const generateHTML = (employees) => {
-    const HTML = [];
-    //filtered by role and pushed into HTML array
-    
-    HTML.push(employees.filter((employee) => employee.getRole() === "Manager").map((manager) => renderManager(manager)));
-    
-    HTML.push(employees.filter((employee) => employee.getRole() === "Engineer").map((engineer) => renderEngineer(engineer)));
-    
-    HTML.push(employees.filter((employee) => employee.getRole() === "Intern").map((intern) => renderIntern(intern)));
+    return `
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+</head>
+<body>
+${employees.map(employee => {
+    let employeeRole = employee.getRole();
+    let HTML = `<div class="card" style="width: 18rem;">
+    <div class="card-header">
+      Role: ${employeeRole}
+    </div>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">Name: ${employee.name}</li>
+      <li class="list-group-item">ID: ${employee.id}</li>
+      <li class="list-group-item">Email: ${employee.email}</li>`
 
-    return renderFullMarkdown(HTML.join(""));
-};
-
-const managerInstance = (manager) => {
-    let template = fs.readFileSync(
-        path.resolve(templateDirectory, "manager.html"), "utf8"
-    );
-    template = replaceTemplates(template, "name", manager.getName());
-    template = replaceTemplates(template, "id", manager.getId());
-    template = replaceTemplates(template, "role", manager.getRole());
-    template = replaceTemplates(template, "email", manager.getEmail());
-    template = replaceTemplates(template, "officeNumber", manager.getOfficeNumber());
-
-    return template;
-};
-
-const engineerInstance = (engineer) => {
-    let template = fs.readFileSync(
-        path.resolve(templateDirectory, "engineer.html"), "utf8"
-    );
-    template = replaceTemplates(template, "name", engineer.getName());
-    template = replaceTemplates(template, "id", engineer.getId());
-    template = replaceTemplates(template, "role", engineer.getRole());
-    template = replaceTemplates(template, "email", engineer.getEmail());
-    template = replaceTemplates(template, "github", engineer.getGithub());
-
-    return template;
-};
-
-const internInstance = (intern) => {
-    let template = fs.readFileSync(
-        path.resolve(templateDirectory, "intern.html"), "utf8"
-    );
-    template = replaceTemplates(template, "name", intern.getName());
-    template = replaceTemplates(template, "id", intern.getId());
-    template = replaceTemplates(template, "role", intern.getRole());
-    template = replaceTemplates(template, "email", intern.getEmail());
-    template = replaceTemplates(template, "school", intern.getOfficeNumber());
-
-    return template;
-};
-
-const renderFullMarkdown = (HTML) => {
-    let template = fs.readFileSync(
-        path.resolve(templateDirectory, "full-markdown.html"), "utf8"
-    );
-
-    return replaceTemplates(template, "team", HTML);
-};
-
-const replaceTemplates = (template, placeholder, value) => {
-    const pattern = new RegExp(`{{${placeholder}}}`, "gm");
-    return template.replace(pattern, value);
-};
+      if (employeeRole === "Manager") {
+        return `
+        ${HTML}
+        <li class="list-group-item">Office Number: ${employee.getOfficeNumber()}</li>
+        </ul>
+      </div>
+        `
+      } 
+      else if (employeeRole === "Engineer") {
+        return `
+        ${HTML}
+        <li class="list-group-item">Github: ${employee.getGithub()}</li>
+        </ul>
+      </div>
+        `
+      }
+      else if (employeeRole === "Intern") {
+        return `
+        ${HTML}
+        <li class="list-group-item">School: ${employee.getSchool()}</li>
+        </ul>
+      </div>
+        `
+      }
+})}
+</body>
+</html>
+    `
+}
 
 module.exports = generateHTML;
